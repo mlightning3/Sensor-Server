@@ -1,0 +1,23 @@
+{% extends "layout.html" %}
+{% block body %}
+  {% if session.logged_in %}
+    <form action="{{ url_for('add_entry') }}" method=post class=add-entry>
+      <dl>
+        <dt>Temperature:
+        <dd><input type=number size=30 name=temperature>
+	<dt>Humidity:
+        <dd><input type=number size=30 name=humidity>
+	<dt>Pressure:
+        <dd><input type=number size=30 name=pressure>
+	<dd><input type=submit value=Submit>
+      </dl>
+    </form>
+  {% endif %}
+  <ul class=weather>
+  {% for entry in weather %}
+  <li><h2>{{ entry.date }}</h2>Temp: {{ entry.temperature }}, Humidity: {{ entry.humidity }}, Pressure: {{ entry.pressure }}
+  {% else %}
+    <li><em>No entries here so far</em>
+  {% endfor %}
+  </ul>
+{% endblock %}
