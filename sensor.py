@@ -44,13 +44,28 @@ def show_entries():
     cur = g.db.execute('SELECT date, temperature, humidity, pressure FROM weather ORDER BY id desc')
     entries = [dict(date=row[0], temperature=row[1], humidity=row[2], pressure=row[3]) for row in cur.fetchall()]
 
+    # datetimeline = pygal.DateTimeLine(
+    #         x_label_rotation=30, truncate_label=-1,
+    #         x_value_formatter=lambda dt: dt.strftime('%d, %b %Y %I:%M %p')
+    #         )
+    # datetimeline.add("Temp F", [(row[0], row[1]) for row in cur.fetchall()])
+    # datetimeline.render_response()
+
+    # return render_template('show_entries.html', wgraph=datetimeline, weather=entries)
+    return render_template('show_entries.html', weather=entries)
+
+@app.route('/wgraph.svg')
+def weather_route():
+    cur = g.db.execute('SELECT date, temperature, humidity, pressure FROM weather ORDER BY id desc')
+
     datetimeline = pygal.DateTimeLine(
             x_label_rotation=30, truncate_label=-1,
             x_value_formatter=lambda dt: dt.strftime('%d, %b %Y %I:%M %p')
             )
     datetimeline.add("Temp F", [(row[0], row[1]) for row in cur.fetchall()])
 
-    return render_template('show_entries.html', wgraph=datetimeline, weather=entries)
+    return datetimeline.render_response()
+
 
 # adding entries to database
 @app.route('/data', methods=['POST'])

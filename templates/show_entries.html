@@ -1,11 +1,13 @@
 {% extends "layout.html" %}
 {% block body %}
-  {{ wgraph.render()|safe }}
-  <ul class=weather>
-  {% for entry in weather %}
-  <li><h2>{{ entry.date }}</h2>Temp: {{ entry.temperature }}, Humidity: {{ entry.humidity }}, Pressure: {{ entry.pressure }}
-  {% else %}
-    <li><em>No entries here so far</em>
-  {% endfor %}
-  </ul>
+    <figure>
+	<embed type="image/svg+xml" src="/wgraph.svg" />
+    </figure>
+    <ul class=weather>
+	{% for entry in weather %}
+	<li><h2>{{ entry.date }}</h2>Temp: {{ entry.temperature }}, Humidity: {{ entry.humidity }}, Pressure: {{ entry.pressure }}
+	{% else %}
+	<li><em>No entries here so far</em>
+	{% endfor %}
+    </ul>
 {% endblock %}
