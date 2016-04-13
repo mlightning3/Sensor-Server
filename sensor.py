@@ -46,15 +46,40 @@ def show_entries():
 
     return render_template('show_entries.html', weather=entries)
 
-@app.route('/wgraph.svg')
-def weather_route():
+# drawing graphs
+@app.route('/tgraph.svg')
+def draw_t_graph():
     cur = g.db.execute('SELECT date, temperature, humidity, pressure FROM weather ORDER BY id desc')
 
     datetimeline = pygal.DateTimeLine(
             x_label_rotation=30, truncate_label=-1,
             x_value_formatter=lambda dt: dt.strftime('%d, %b %Y %I:%M %p')
             )
-    datetimeline.add("Temp F", [(datetime.strptime(row[0], '%Y-%m-%d %I:%M:%S.%f'), float(row[1])) for row in cur.fetchall()])
+    datetimeline.add("Temp", [(datetime.strptime(row[0], '%Y-%m-%d %H:%M:%S.%f'), float(row[1])) for row in cur.fetchall()])
+
+    return datetimeline.render_response()
+
+@app.route('/hgraph.svg')
+def draw_h_graph():
+    cur = g.db.execute('SELECT date, temperature, humidity, pressure FROM weather ORDER BY id desc')
+
+    datetimeline = pygal.DateTimeLine(
+            x_label_rotation=30, truncate_label=-1,
+            x_value_formatter=lambda dt: dt.strftime('%d, %b %Y %I:%M %p')
+            )
+    datetimeline.add("Humidity", [(datetime.strptime(row[0], '%Y-%m-%d %H:%M:%S.%f'), float(row[2])) for row in cur.fetchall()])
+
+    return datetimeline.render_response()
+
+@app.route('/pgraph.svg')
+def draw_p_graph():
+    cur = g.db.execute('SELECT date, temperature, humidity, pressure FROM weather ORDER BY id desc')
+
+    datetimeline = pygal.DateTimeLine(
+            x_label_rotation=30, truncate_label=-1,
+            x_value_formatter=lambda dt: dt.strftime('%d, %b %Y %I:%M %p')
+            )
+    datetimeline.add("Pressure", [(datetime.strptime(row[0], '%Y-%m-%d %H:%M:%S.%f'), float(row[3])) for row in cur.fetchall()])
 
     return datetimeline.render_response()
 
