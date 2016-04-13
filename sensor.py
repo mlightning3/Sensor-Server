@@ -8,7 +8,7 @@ import pygal
 # configuration
 DATABASE = '/tmp/sensors.db'
 DEBUG = True
-SECRET_KEY = 'development key'
+SECRET_KEY = 'development_key'
 
 # app creation
 app = Flask(__name__)
@@ -44,14 +44,6 @@ def show_entries():
     cur = g.db.execute('SELECT date, temperature, humidity, pressure FROM weather ORDER BY id desc')
     entries = [dict(date=row[0], temperature=row[1], humidity=row[2], pressure=row[3]) for row in cur.fetchall()]
 
-    # datetimeline = pygal.DateTimeLine(
-    #         x_label_rotation=30, truncate_label=-1,
-    #         x_value_formatter=lambda dt: dt.strftime('%d, %b %Y %I:%M %p')
-    #         )
-    # datetimeline.add("Temp F", [(row[0], row[1]) for row in cur.fetchall()])
-    # datetimeline.render_response()
-
-    # return render_template('show_entries.html', wgraph=datetimeline, weather=entries)
     return render_template('show_entries.html', weather=entries)
 
 @app.route('/wgraph.svg')
@@ -62,13 +54,13 @@ def weather_route():
             x_label_rotation=30, truncate_label=-1,
             x_value_formatter=lambda dt: dt.strftime('%d, %b %Y %I:%M %p')
             )
-    datetimeline.add("Temp F", [(row[0], row[1]) for row in cur.fetchall()])
+    datetimeline.add("Temp F", [(datetime.strptime(row[0], '%Y-%m-%d %I:%M:%S.%f'), float(row[1])) for row in cur.fetchall()])
 
     return datetimeline.render_response()
 
 
 # adding entries to database
-@app.route('/data', methods=['POST'])
+@app.route('/data', methods=['POST', 'GET'])
 def add_data():
     mkey = request.args.get('key')
     if mkey != SECRET_KEY:
@@ -80,7 +72,7 @@ def add_data():
     g.db.execute('INSERT INTO weather (date, temperature, humidity, pressure) VALUES (?, ?, ?, ?)', \
             [now, temp, humidity, pressure])
     g.db.commit()
-    return 200
+    return render_template('show_entries.html'), 200
 
 
 if __name__ == '__main__':
